@@ -363,8 +363,71 @@ const fmt = (n, d) => n.toLocaleString("en-GB", { minimumFractionDigits: d, maxi
 function hours(h) {
   if (!isFinite(h) || h <= 0) return "–";
   if (h > 99) return "> 99 h";
-  const hh = Math.floor(h), mm = Math.round((h - hh) * 60);
+  let hh = Math.floor(h), mm = Math.round((h - hh) * 60);
+  if (mm === 60) { hh++; mm = 0; }
   return `${hh} h ${String(mm).padStart(2, "0")} min`;
+}
+
+// ---------- time remaining ----------
+// One reading jumps with every kettle, pump or passing cloud, so the estimate uses the current
+// averaged over the last few minutes. When the battery really changes direction (charging,
+// discharging or idle for several readings in a row) the average starts over, so the time
+// shows up at once instead of crawling in from a stale value.
+const IDLE_A = 0.05;        // below this the battery counts as idle
+const AVG_TAU_S = 120;      // averaging time constant
+const FLIP_MS = 6000;       // a new direction must hold this long before the average restarts
+const GAP_MS = 60000;       // readings further apart than this (reconnect, demo) start over
+let avgI = null, avgDir = 0, avgAt = 0, flipSince = 0;
+const dirOf = (i) => (i > IDLE_A ? 1 : i < -IDLE_A ? -1 : 0);
+
+function resetEta() { avgI = null; }
+
+function smoothCurrent(I, now) {
+  const dt = now - avgAt;
+  avgAt = now;
+  const restart = () => { avgI = I; avgDir = dirOf(I); flipSince = 0; return { I: avgI, dir: avgDir }; };
+  if (avgI == null || dt <= 0 || dt > GAP_MS) return restart();
+  if (dirOf(I) !== avgDir) {
+    // hold the average while a possible change of direction proves itself
+    flipSince ||= now;
+    if (now - flipSince >= FLIP_MS) return restart();
+  } else {
+    flipSince = 0;
+    avgI += (I - avgI) * (1 - Math.exp(-dt / 1000 / AVG_TAU_S));
+  }
+  return { I: avgI, dir: avgDir };
+}
+
+function clockAt(h) {
+  const at = new Date(Date.now() + h * 3600e3);
+  const time = at.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  const days = Math.round((new Date(at).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0)) / 864e5);
+  if (days === 0) return time;
+  if (days === 1) return "tomorrow " + time;
+  return at.toLocaleDateString("en-GB", { weekday: "short" }) + " " + time;
+}
+
+function renderEta(d) {
+  const { I, dir } = smoothCurrent(d.current, Date.now());
+  const label = $("etaLabel"), eta = $("eta");
+  // the BMS can report a little over full right after charging
+  const full = Math.max(d.full, d.remain);
+  let h = NaN;
+  if (dir > 0) {
+    label.textContent = "To full";
+    if (d.soc >= 100 || full - d.remain < 0.05) { eta.textContent = "Full"; return; }
+    h = (full - d.remain) / I;
+  } else if (dir < 0) {
+    label.textContent = "To empty";
+    h = d.remain / -I;
+  } else {
+    label.textContent = "Time";
+    eta.textContent = d.soc >= 100 ? "Full" : "Idle";
+    return;
+  }
+  eta.innerHTML = isFinite(h) && h > 0 && h <= 99
+    ? `${hours(h)}<br><small>until ${clockAt(h)} · avg ${fmt(Math.abs(I), 1)} A</small>`
+    : hours(h);
 }
 
 function render(d) {
@@ -379,7 +442,7 @@ function render(d) {
   // positive current = charging (sign as reported by the BMS)
   const I = d.current;
   const mode = $("mode");
-  if (Math.abs(I) < 0.05) { mode.textContent = "Idle"; mode.className = "mode"; }
+  if (Math.abs(I) < IDLE_A) { mode.textContent = "Idle"; mode.className = "mode"; }
   else if (I > 0) { mode.textContent = "Charging"; mode.className = "mode charge"; }
   else { mode.textContent = "Discharging"; mode.className = "mode discharge"; }
 
@@ -390,9 +453,7 @@ function render(d) {
   $("cycles").textContent = d.cycles;
   $("soh").innerHTML = `${d.soh} <small>%</small>`;
 
-  if (I > 0.05) { $("etaLabel").textContent = "To full"; $("eta").textContent = hours((d.full - d.remain) / I); }
-  else if (I < -0.05) { $("etaLabel").textContent = "To empty"; $("eta").textContent = hours(d.remain / -I); }
-  else { $("etaLabel").textContent = "Time"; $("eta").textContent = "–"; }
+  renderEta(d);
 
   const min = Math.min(...d.cells), max = Math.max(...d.cells);
   const lo = 2.8, hi = 3.65;
@@ -759,6 +820,7 @@ async function setup() {
   rx.addEventListener("characteristicvaluechanged", onNotify);
   await rx.startNotifications();
   $("connectBtn").textContent = "Disconnect";
+  resetEta();
   keepAwake(true);
   if (activeTab === "charts") renderCharts();
   pollLoop();
@@ -865,6 +927,7 @@ function makeDemoHistory() {
 $("demoBtn").addEventListener("click", () => {
   demo = true;
   demoHistory = makeDemoHistory();
+  resetEta();
   render({
     current: 0, voltage: 27.4, soc: 100, soh: 100, remain: 99.91, full: 100, cycles: 2,
     cells: [3.438, 3.431, 3.422, 3.407, 3.431, 3.422, 3.424, 3.431],
