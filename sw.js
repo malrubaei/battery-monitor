@@ -1,5 +1,5 @@
 // Keeps the page working offline: in a power cut the router, and with it the internet, is off too
-const CACHE = "battery-v2-en";
+const CACHE = "battery-v3-en";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", (e) => {
