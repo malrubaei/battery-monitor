@@ -237,6 +237,17 @@
       </section>
 
       <section class="card">
+        <h2>Balancing</h2>
+        <div class="grid two">
+          <div class="kv"><div class="k">Balancing now</div><div class="v" id="balNow">–</div></div>
+          <div class="kv"><div class="k">Status code</div><div class="v" id="balRaw">–</div></div>
+          <div class="kv"><div class="k">Start voltage</div><div class="v" id="balStart">–</div></div>
+          <div class="kv"><div class="k">Start difference</div><div class="v" id="balDelta">–</div></div>
+        </div>
+        <p class="note" id="balNote" style="margin:12px 0 0"></p>
+      </section>
+
+      <section class="card">
         <h2>Temperature</h2>
         <div class="temps" id="temps"></div>
       </section>
@@ -281,6 +292,10 @@ const KEEP_MS = 30 * 24 * 3600e3;
 
 const $ = (id) => document.getElementById(id);
 let device = null, txChar = null, rxBuf = [], pending = null, polling = false, demo = false;
+// Balance settings, read once per connection. Read-only: this page never writes to the BMS.
+// Addresses follow the PACE BMS Modbus map (12 = balance status, 105/106 = balance start
+// voltage / start difference in mV); not yet confirmed for this BMS, so the card shows raw values.
+let balSettings = null;
 
 function crc16(bytes) {
   let crc = 0xffff;
@@ -337,6 +352,10 @@ async function readAll() {
   const t = await readRegs(46, 11);
   let extra = null;
   try { [extra] = await readRegs(57, 1); } catch (_) {}
+  if (!balSettings) {
+    try { const [start, delta] = await readRegs(105, 2); balSettings = { start, delta }; }
+    catch (_) { balSettings = { error: true }; }
+  }
   const nCells = Math.min(c[0], 16);
   const nTemps = Math.min(t[0], 10);
   return {
@@ -350,6 +369,8 @@ async function readAll() {
     cells: c.slice(1, 1 + nCells).map((v) => v / 1000),
     temps: t.slice(1, 1 + nTemps).map((v) => s16(v) / 10),
     boardTemp: extra != null && extra !== 0xffff ? s16(extra) / 10 : null,
+    balanceBits: a[12],
+    balance: balSettings,
   };
 }
 
@@ -408,12 +429,38 @@ function render(d) {
   $("cdelta").textContent = delta + " mV";
   $("cdelta").style.color = delta > 100 ? "var(--bad)" : delta > 50 ? "var(--warn)" : "";
 
+  renderBalance(d);
+
   const temps = d.temps.map((t, i) => [`Sensor ${i + 1}`, t]);
   if (d.boardTemp != null) temps.push(["Board", d.boardTemp]);
   $("temps").innerHTML = temps.map(([k, v]) =>
     `<div class="temp"><div class="k">${k}</div><div class="v">${fmt(v, 1)} °C</div></div>`).join("");
 
   $("updated").textContent = (demo ? "Example data · " : "Updated ") + new Date().toLocaleTimeString("en-GB");
+}
+
+function renderBalance(d) {
+  const bits = d.balanceBits, n = d.cells.length, notes = [];
+  const on = [];
+  for (let i = 0; i < 16; i++) if (bits & (1 << i)) on.push(i + 1);
+  $("balRaw").textContent = "0x" + bits.toString(16).toUpperCase().padStart(4, "0");
+  $("balNow").textContent = on.length ? on.map((k) => "#" + k).join(", ") : "None";
+  if (on.some((k) => k > n)) notes.push("The status code marks cells this battery doesn't have, so it may mean something else on this BMS.");
+
+  const b = d.balance;
+  if (!b || b.error) {
+    $("balStart").textContent = "–"; $("balDelta").textContent = "–";
+    notes.push("The BMS didn't answer the request for balance settings.");
+  } else {
+    $("balStart").innerHTML = `${b.start} <small>mV</small>`;
+    $("balDelta").innerHTML = `${b.delta} <small>mV</small>`;
+    const plausible = b.start >= 3000 && b.start <= 3650 && b.delta >= 5 && b.delta <= 300;
+    notes.push(plausible
+      ? "These values look like normal balance settings, which suggests the register layout matches."
+      : "These values don't look like balance settings, so this BMS probably stores them elsewhere.");
+  }
+  notes.push("Read only: this page doesn't change any BMS settings.");
+  $("balNote").textContent = notes.join(" ");
 }
 
 // ---------- history storage (IndexedDB, this device only) ----------
@@ -755,6 +802,7 @@ async function setup() {
   const server = await device.gatt.connect();
   const svc = await server.getPrimaryService(SERVICE);
   txChar = await svc.getCharacteristic(TX_CHAR);
+  balSettings = null;
   const rx = await svc.getCharacteristic(RX_CHAR);
   rx.addEventListener("characteristicvaluechanged", onNotify);
   await rx.startNotifications();
@@ -869,6 +917,7 @@ $("demoBtn").addEventListener("click", () => {
     current: 0, voltage: 27.4, soc: 100, soh: 100, remain: 99.91, full: 100, cycles: 2,
     cells: [3.438, 3.431, 3.422, 3.407, 3.431, 3.422, 3.424, 3.431],
     temps: [20.0, 20.2], boardTemp: 21.7,
+    balanceBits: 0x0001, balance: { start: 3400, delta: 30 },
   });
 });
 
