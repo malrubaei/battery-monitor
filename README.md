@@ -1,6 +1,6 @@
 # Battery Monitor
 
-English translation of the web page from [llllldddddd/battery-monitor](https://github.com/llllldddddd/battery-monitor). This repo holds only the web page; the Mac and Android apps described below are in the original repo.
+English translation of [llllldddddd/battery-monitor](https://github.com/llllldddddd/battery-monitor): the web page plus its Mac and Android apps, with the apps' text translated to English. All credit for the original code goes to its author.
 
 LiFePO4 battery readings over Bluetooth: a web page, a Mac app and an Android app.
 All three work without internet — which matters when the power is out and the router is off too.
@@ -42,3 +42,9 @@ One interface for everything: `index.html`. The apps have no Web Bluetooth, so `
 `android/.../MainActivity.java` (Android BLE API).
 
 Protocol: Nations Bluetooth module (service `00002760-08c2-11e1-9073-0e8ac72e1001`), Modbus RTU inside, address 1, function 03.
+
+## Credits
+
+Original project: [llllldddddd/battery-monitor](https://github.com/llllldddddd/battery-monitor), copied from commit `f1b2f98`.
+The changes here are the English translation and new app IDs (`io.github.malrubaei.battery`), so these builds install alongside the original ones.
+The original repo has no license file. The Gradle wrapper in `android/` is Apache-2.0, from the Gradle project.
