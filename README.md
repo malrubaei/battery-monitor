@@ -1,6 +1,6 @@
 # Battery Monitor
 
-English translation of the web page from [llllldddddd/battery-monitor](https://github.com/llllldddddd/battery-monitor). This repo holds only the web page; the Mac and Android apps described below are in the original repo.
+English translation of the web page from [llllldddddd/battery-monitor](https://github.com/llllldddddd/battery-monitor). 
 
 LiFePO4 battery readings over Bluetooth: a web page, a Mac app and an Android app.
 All three work without internet — which matters when the power is out and the router is off too.
