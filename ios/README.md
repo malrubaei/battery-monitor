@@ -23,7 +23,7 @@ function 03 inside. See `BatteryMonitor/BMSProtocol.swift`.
 
 ## Build and install with a free Apple ID
 
-1. Install Xcode from the App Store and sign in under
+1. Install Xcode (26.x on an Intel Mac, from developer.apple.com/download/all; the App Store Xcode 27 needs Apple silicon) and sign in under
    Xcode → Settings → Accounts with your Apple ID.
 2. Open `ios/BatteryMonitor.xcodeproj`.
 3. Select the **BatteryMonitor** target → Signing & Capabilities → Team: your
