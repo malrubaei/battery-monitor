@@ -29,7 +29,10 @@ function 03 inside. See `BatteryMonitor/BMSProtocol.swift`.
 3. Select the **BatteryMonitor** target → Signing & Capabilities → Team: your
    “(Personal Team)”. If the bundle id is taken, change it to something unique,
    e.g. `com.yourname.batterymonitor`.
-4. Plug in the iPhone, unlock it and tap **Trust**. On the iPhone, turn on
+4. Plug in the iPhone, unlock it and tap **Trust**. If macOS runs in a
+   Proxmox VM, first pass the phone through: VM → Hardware → Add → USB Device →
+   Use USB Port → the Apple iPhone port, with Use USB3 ticked (it can be added
+   while the VM runs). On the iPhone, turn on
    Settings → Privacy & Security → Developer Mode (it restarts).
 5. Choose the iPhone as the run destination and press Run (⌘R).
 6. The first time, iOS blocks the app: on the iPhone go to Settings → General →
