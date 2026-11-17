@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support – BMS Battery Monitor</title>
+<style>
+:root{--bg:#fff;--fg:#14191c;--muted:#5b6670;--accent:#1f9e6b}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1417;--fg:#e8f0eb;--muted:#9aa6ad;--accent:#2ecf8c}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+main{max-width:680px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:1.7rem;margin:0 0 4px}h2{font-size:1.15rem;margin:28px 0 8px}
+.muted{color:var(--muted)}a{color:var(--accent)}li{margin:4px 0}
+</style>
+</head>
+<body>
+<main>
+<h1>BMS Battery Monitor</h1>
+<p class="muted">Support for the iPhone app</p>
+
+<h2>Connecting</h2>
+<ol>
+<li>Turn on Bluetooth on your iPhone.</li>
+<li>Close any other app or web page connected to the battery: it accepts only one connection at a time.</li>
+<li>Open the app, tap <strong>Connect</strong> and choose the device named <strong>BMS-…</strong>. If no device has that name, try the unnamed device with the strongest signal.</li>
+</ol>
+
+<h2>Which batteries work?</h2>
+<p>Batteries whose management board (BMS) uses the Nations BLE UART Bluetooth module with the Modbus protocol. Not every BMS uses it. Tap <strong>Show example</strong> in the app to see what it looks like with sample data.</p>
+
+<h2>Recording in the background</h2>
+<p>Once connected, the app records a reading every 10 seconds, also while the phone is locked, and keeps 30 days of history. Recording stops if you close the app by swiping it away in the app switcher; open the app again to resume. Low Power Mode can make iOS pause it more often.</p>
+
+<h2>Privacy</h2>
+<p>The app collects no personal data. See the <a href="privacy-policy.html">privacy policy</a>.</p>
+
+<h2>Contact</h2>
+<p>Email <a href="mailto:{{CONTACT_EMAIL}}">{{CONTACT_EMAIL}}</a>. Please include your iPhone model, iOS version and the name your battery shows when you tap Connect.</p>
+</main>
+</body>
+</html>
