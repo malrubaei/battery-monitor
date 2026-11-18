@@ -16,30 +16,51 @@ h1{font-size:1.7rem;margin:0 0 4px}h2{font-size:1.15rem;margin:28px 0 8px}
 <body>
 <main>
 <h1>Battery BMS</h1>
-<p class="muted">Support for the iPhone app</p>
+<p class="muted">Help and support for the iPhone app</p>
 
-<h2>Connecting</h2>
+<h2>Connecting the first time</h2>
 <ol>
 <li>Turn on Bluetooth on your iPhone.</li>
 <li>Close any other app or web page connected to the battery: it accepts only one connection at a time.</li>
-<li>Open the app, tap <strong>Connect</strong> and choose the device named <strong>BMS-…</strong>. If no device has that name, try the unnamed device with the strongest signal.</li>
+<li>Open the app and tap <strong>Connect</strong>. Choose the device named <strong>BMS-…</strong>. If no device has that name, tap <strong>Battery not in the list</strong> and pick the unnamed device or the one with the strongest signal.</li>
+<li>Allow Bluetooth when iOS asks.</li>
 </ol>
+<p>After that the app remembers the battery and reconnects on its own. To look around without a battery, tap <strong>Show example</strong>.</p>
+
+<h2>More than one battery</h2>
+<p>Tap the gear at the top right of the Now screen to open <strong>Settings</strong>. Under <strong>Batteries</strong>:</p>
+<ul>
+<li><strong>Add battery</strong> finds another battery nearby.</li>
+<li>Tap a battery to <strong>rename</strong> it, <strong>connect</strong>, <strong>disconnect</strong> or <strong>forget</strong> it. The name shows at the top of the Now screen.</li>
+<li>The app talks to one battery at a time; connecting to another disconnects the current one. Forgetting a battery keeps its recorded history.</li>
+</ul>
+<p>Settings also has the theme: Match iPhone, Light or Dark.</p>
 
 <h2>Which batteries work?</h2>
 <p>Batteries whose management board (BMS) uses the Nations BLE UART Bluetooth module with the Modbus protocol. Not every BMS uses it. Tap <strong>Show example</strong> in the app to see what it looks like with sample data.</p>
 
 <h2>Recording in the background</h2>
-<p>Once connected, the app records a reading every 10 seconds, also while the phone is locked, and keeps 30 days of history. Recording stops if you close the app by swiping it away in the app switcher; open the app again to resume. Low Power Mode can make iOS pause it more often.</p>
+<p>While connected, the app records a reading every 10 seconds, also while the phone is locked, and keeps 30 days of history. Recording stops if you swipe the app away in the app switcher, turn off Bluetooth or the battery is out of range; open the app again to resume. Low Power Mode can make iOS pause it more often, which leaves gaps in the charts.</p>
 
 <h2>Free trial and Pro</h2>
-<p>Live readings, background recording and the last hour of charts are free. <strong>Pro</strong> adds charts for 6 hours up to 30 days and CSV export. You can try Pro free for 7 days (Charts tab → <strong>Try Pro free for 7 days</strong>); nothing is charged when the trial ends, the Pro features just lock again. Pro is then a one-time purchase, not a subscription.</p>
-<p>New phone or reinstalled the app? Open the Pro screen and tap <strong>Restore purchases</strong> with the same Apple ID. For refunds, use <a href="https://reportaproblem.apple.com">reportaproblem.apple.com</a>; purchases are handled by Apple.</p>
+<p>Live readings, background recording and the last hour of charts are free. <strong>Pro</strong> adds charts for 6 hours up to 30 days and CSV export. You can try Pro free for 7 days (Charts → <strong>Try Pro free for 7 days</strong>, or Settings → <strong>Battery BMS Pro</strong>); nothing is charged when the trial ends, the Pro features just lock again. Pro is then a one-time purchase, not a subscription.</p>
+<p>New phone or reinstalled the app? Tap <strong>Restore purchases</strong> in Settings or on the Pro screen, signed in with the same Apple ID. For refunds, use <a href="https://reportaproblem.apple.com">reportaproblem.apple.com</a>; purchases are handled by Apple.</p>
+
+<h2>Common problems</h2>
+<ul>
+<li><strong>The battery is not in the list.</strong> Close other apps or the web page connected to it, move closer, then tap <strong>Battery not in the list</strong>.</li>
+<li><strong>"Turn on Bluetooth to connect".</strong> Turn on Bluetooth in Control Center.</li>
+<li><strong>Bluetooth was denied.</strong> iPhone Settings → Battery BMS → turn on Bluetooth.</li>
+<li><strong>"This battery isn't known to the iPhone any more".</strong> Forget it in Settings and add it again.</li>
+<li><strong>Connected but no readings.</strong> The board probably does not use the supported module.</li>
+<li><strong>Deleting my data.</strong> Charts → <strong>Clear history</strong>, or delete the app. Nothing is stored anywhere else.</li>
+</ul>
 
 <h2>Privacy</h2>
-<p>The app collects no personal data. See the <a href="privacy-policy.html">privacy policy</a>.</p>
+<p>The app collects no personal data. See the <a href="privacy-policy.html">privacy policy</a> and the <a href="terms.html">terms of use</a>.</p>
 
 <h2>Contact</h2>
-<p>Email <a href="mailto:bmsbatterymonitor.support@gmail.com">bmsbatterymonitor.support@gmail.com</a>. Please include your iPhone model, iOS version and the name your battery shows when you tap Connect.</p>
+<p>Email <a href="mailto:bmsbatterymonitor.support@gmail.com">bmsbatterymonitor.support@gmail.com</a>. Please include your iPhone model, iOS version and the name your battery shows in the list when you connect.</p>
 </main>
 </body>
 </html>
